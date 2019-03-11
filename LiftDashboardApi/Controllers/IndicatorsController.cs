@@ -9,10 +9,10 @@ namespace LiftDashboardApi.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
-  public class DashboardSummaryController : ControllerBase
+  public class IndicatorsController : ControllerBase
   {
     private IMediator _mediator;
-    public DashboardSummaryController(IMediator mediator) => _mediator = mediator;
+    public IndicatorsController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
     public async Task<IActionResult> Index()

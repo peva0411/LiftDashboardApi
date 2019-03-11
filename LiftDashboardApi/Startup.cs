@@ -28,6 +28,8 @@ namespace LiftDashboardApi
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+      services.AddCors();
+
       services.AddDbContext<ProductDbContext>(options => options.UseSqlServer(Configuration["Products:ConnectionString"]));
       services.AddMediatR();
       services.AddMvc()
@@ -45,6 +47,8 @@ namespace LiftDashboardApi
       {
         app.UseHsts();
       }
+
+      app.UseCors(builder => builder.AllowAnyOrigin());
 
       app.UseHttpsRedirection();
       app.UseMvc();
