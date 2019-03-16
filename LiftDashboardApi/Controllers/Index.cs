@@ -46,6 +46,8 @@ namespace LiftDashboardApi.Controllers
         public string Text { get; set; }
         public decimal Rating { get; set; }
         public string ProductName { get; set; }
+        public DateTime Date { get; set; }
+        public string FormattedDate { get; set; }
       }
     }
 
@@ -68,7 +70,9 @@ namespace LiftDashboardApi.Controllers
 
         var monthAgo = DateTime.Now.AddDays(-30);
         var badReviews = _db.Reviews.Include(r => r.Product)
-          .Where(r => r.Rating <= 2.0M && r.Date > monthAgo).ToList();
+          .Where(r => r.Rating <= 2.0M && r.Date > monthAgo)
+          .OrderByDescending(r => r.Date)
+          .ToList();
 
 
         return new Result()
@@ -86,6 +90,17 @@ namespace LiftDashboardApi.Controllers
             Msrp = m.Msrp.Value,
             Price = m.LastPrice.Value,
             Name = m.Title
+          }).ToList(),
+          BadReviews = badReviews.Select(b => new Result.BadReview
+          {
+            Asin = b.Asin, 
+            Title = b.Title,
+            ProductName = b.Product.Title,
+            Date = b.Date,
+            FormattedDate = b.Date.ToShortDateString(),
+            Rating = b.Rating,
+            Author = b.Author,
+            Text = b.Text
           }).ToList()
         };
        
