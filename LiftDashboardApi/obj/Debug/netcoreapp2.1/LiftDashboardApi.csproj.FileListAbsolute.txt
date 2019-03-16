@@ -2,7 +2,6 @@ C:\Projects\LiftDashboardApi\LiftDashboardApi\bin\Debug\netcoreapp2.1\LiftDashbo
 C:\Projects\LiftDashboardApi\LiftDashboardApi\bin\Debug\netcoreapp2.1\LiftDashboardApi.runtimeconfig.json
 C:\Projects\LiftDashboardApi\LiftDashboardApi\bin\Debug\netcoreapp2.1\LiftDashboardApi.runtimeconfig.dev.json
 C:\Projects\LiftDashboardApi\LiftDashboardApi\bin\Debug\netcoreapp2.1\LiftDashboardApi.dll
-C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\LiftDashboardApi.csprojResolveAssemblyReference.cache
 C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\LiftDashboardApi.csproj.CoreCompileInputs.cache
 C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\LiftDashboardApi.RazorAssemblyInfo.cache
 C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\LiftDashboardApi.RazorAssemblyInfo.cs
@@ -13,3 +12,4 @@ C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\UserSecret
 C:\Projects\LiftDashboardApi\LiftDashboardApi\bin\Debug\netcoreapp2.1\LiftDashboardApi.pdb
 C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\LiftDashboardApi.dll
 C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\LiftDashboardApi.pdb
+C:\Projects\LiftDashboardApi\LiftDashboardApi\obj\Debug\netcoreapp2.1\LiftDashboardApi.csprojAssemblyReference.cache

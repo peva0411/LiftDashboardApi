@@ -14,10 +14,12 @@ namespace LiftDashboardApi.Data
     }
 
     public DbSet<Product> Products { get; set; }
-
+    public DbSet<Review> Reviews { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       modelBuilder.Entity<Product>().ToTable("Product");
+      modelBuilder.Entity<Review>().ToTable("Review");
+      modelBuilder.Entity<Review>().HasOne(r => r.Product).WithMany(p => p.Reviews).HasForeignKey(r => r.Asin).HasPrincipalKey(p => p.Asin);
 
       modelBuilder.Entity<ClientProduct>()
         .HasOne<Client>(c => c.Client)
@@ -60,5 +62,18 @@ namespace LiftDashboardApi.Data
     public decimal? LastPrice { get; set; }
 
     public ICollection<ClientProduct> ClientProducts { get; set; }
+    public ICollection<Review> Reviews { get; set; }
+  }
+
+  public class Review
+  {
+    public int ReviewId { get; set; }
+    public string Asin { get; set; }
+    public string Title { get; set; }
+    public string Text { get; set; }
+    public decimal Rating { get; set; }
+    public string Author { get; set; }
+    public Product Product { get; set; }
+    public DateTime Date { get; set; }
   }
 }

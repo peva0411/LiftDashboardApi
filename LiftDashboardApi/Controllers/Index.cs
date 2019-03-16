@@ -20,6 +20,7 @@ namespace LiftDashboardApi.Controllers
 
       public List<Indicator> Indicators { get; set; }
       public List<ProductDetail> ProductDetails { get; set; }
+      public List<BadReview> BadReviews { get; set; }
 
       public class Indicator
       {
@@ -35,6 +36,16 @@ namespace LiftDashboardApi.Controllers
         public string Asin { get; set; }
         public decimal Price  { get; set; }
         public decimal Msrp { get; set; }
+      }
+
+      public class BadReview
+      {
+        public string Asin { get; set; }
+        public string Author { get; set; }
+        public string Title { get; set; }
+        public string Text { get; set; }
+        public decimal Rating { get; set; }
+        public string ProductName { get; set; }
       }
     }
 
@@ -55,6 +66,10 @@ namespace LiftDashboardApi.Controllers
           .ThenInclude(p => p.Client)
           .Where(p => p.LastPrice.HasValue && p.Msrp.HasValue && p.LastPrice < p.Msrp).ToList();
 
+        var monthAgo = DateTime.Now.AddDays(-30);
+        var badReviews = _db.Reviews.Include(r => r.Product)
+          .Where(r => r.Rating <= 2.0M && r.Date > monthAgo).ToList();
+
 
         return new Result()
         {
@@ -62,7 +77,7 @@ namespace LiftDashboardApi.Controllers
           {
             new Result.Indicator(){Title = "Below MSRP", Description = "Products with last reported price below MSRP", Count = belowMsrpProducts.Count}, 
             new Result.Indicator(){Title = "3P Sellers", Description = "Third Party Sellers", Count = 10},
-            new Result.Indicator(){Title = "Bad Reviews", Description = "Some bad reviews", Count = 42}
+            new Result.Indicator(){Title = "Bad Reviews", Description = "Reviews with rating below 3 stars within last 30 days", Count = badReviews.Count}
           },
           ProductDetails = belowMsrpProducts.Select(m => new Result.ProductDetail
           {
