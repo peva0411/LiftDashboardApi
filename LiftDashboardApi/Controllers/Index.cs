@@ -21,6 +21,13 @@ namespace LiftDashboardApi.Controllers
       public List<Indicator> Indicators { get; set; }
       public List<ProductDetail> ProductDetails { get; set; }
       public List<BadReview> BadReviews { get; set; }
+      public ChangeEventSummary ChangeEvent { get; set; }
+
+      public class ChangeEventSummary
+      {
+          public List<PriceChange> ProductPriceChangeEvents { get; set; }
+          public List<BuyBoxOwnerChange> BuyBoxOwnerChangeEvents { get; set; }
+      }
 
       public class Indicator
       {
@@ -49,7 +56,29 @@ namespace LiftDashboardApi.Controllers
         public DateTime Date { get; set; }
         public string FormattedDate { get; set; }
       }
-    }
+
+      public class PriceChange
+      {
+          public string Asin { get; set; }
+          public string ProductName { get; set; }
+
+          public string Client { get; set; }
+          public decimal OldPrice { get; set; }
+          public decimal NewPrice { get; set; }
+          public DateTime DateChanged { get; set; }
+      }
+
+      public class BuyBoxOwnerChange
+      {
+          public string Asin { get; set; }
+          public string ProductName { get; set; }
+
+          public string Client { get; set; }
+          public string OldOwner { get; set; }
+          public string NewOwner { get; set; }
+          public DateTime DateChanged { get; set; }
+      }
+        }
 
 
     public class Handler : RequestHandler<Query, Result>
@@ -74,14 +103,50 @@ namespace LiftDashboardApi.Controllers
           .OrderByDescending(r => r.Date)
           .ToList();
 
+        var buyBoxOwnerChangeEvents = _db.BuyBoxOwnerChangeEvents.Where(b => b.DateChanged >= monthAgo).ToList();
+        var priceChangeEvents = _db.ProductPriceChangeEvents.Where(p => p.DateChanged >= monthAgo).ToList();
+        var totalEventCount = buyBoxOwnerChangeEvents.Count + priceChangeEvents.Count;
+
+        var productPriceChangeInfoes = _db.Products.Include(p => p.ClientProducts)
+            .ThenInclude(p => p.Client)
+            .Where(p => priceChangeEvents.Select(pp => pp.Asin).Contains(p.Asin) || buyBoxOwnerChangeEvents.Select(b => b.Asin).Contains(p.Asin));
+
+
+
+        var priceChangeEventDtos = priceChangeEvents.Join(productPriceChangeInfoes, p => p.Asin, i => i.Asin, (@event, product) =>
+            new Result.PriceChange
+            {
+                Asin = @event.Asin,
+                ProductName = product.Title,
+                Client = product.ClientProducts.FirstOrDefault().Client.Name,
+                DateChanged = @event.DateChanged,
+                OldPrice = @event.OldPrice,
+                NewPrice = @event.NewPrice
+            }).ToList();
+
+        var buyBoxChangeEventDtos = buyBoxOwnerChangeEvents.Join(productPriceChangeInfoes, b => b.Asin, i => i.Asin,
+            (@event, product) => new Result.BuyBoxOwnerChange
+            {
+                Asin = @event.Asin,
+                ProductName = product.Title,
+                Client = product.ClientProducts.FirstOrDefault().Client.Name,
+                DateChanged = @event.DateChanged,
+                OldOwner = @event.OldOwner,
+                NewOwner = @event.NewOwner
+            }).ToList();
 
         return new Result()
         {
           Indicators = new List<Result.Indicator>
           {
             new Result.Indicator(){Title = "Below MSRP", Description = "Products with last reported price below MSRP", Count = belowMsrpProducts.Count}, 
-            new Result.Indicator(){Title = "3P Sellers", Description = "Third Party Sellers", Count = 10},
+            new Result.Indicator(){Title = "Change Events", Description = "Price or Buy Box Owner changes", Count = totalEventCount},
             new Result.Indicator(){Title = "Bad Reviews", Description = "Reviews with rating below 3 stars within last 30 days", Count = badReviews.Count}
+          },
+          ChangeEvent = new Result.ChangeEventSummary
+          {
+            ProductPriceChangeEvents = priceChangeEventDtos,
+            BuyBoxOwnerChangeEvents = buyBoxChangeEventDtos
           },
           ProductDetails = belowMsrpProducts.Select(m => new Result.ProductDetail
           {

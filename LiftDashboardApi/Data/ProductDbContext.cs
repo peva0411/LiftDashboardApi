@@ -15,10 +15,19 @@ namespace LiftDashboardApi.Data
 
     public DbSet<Product> Products { get; set; }
     public DbSet<Review> Reviews { get; set; }
+
+    public DbSet<ProductPriceChangeEvent> ProductPriceChangeEvents { get; set; }
+    public DbSet<BuyBoxOwnerChangeEvent> BuyBoxOwnerChangeEvents { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       modelBuilder.Entity<Product>().ToTable("Product");
       modelBuilder.Entity<Review>().ToTable("Review");
+      modelBuilder.Entity<ProductPriceChangeEvent>().ToTable("ProductPriceChange");
+      modelBuilder.Entity<BuyBoxOwnerChangeEvent>().ToTable("BuyBoxOwnerChange");
+      modelBuilder.Entity<BuyBoxOwnerChangeEvent>().HasKey(b => b.BuyBoxOwnerChangeId);
+      modelBuilder.Entity<ProductPriceChangeEvent>().HasKey(p => p.ProductPriceChangeId);
+
       modelBuilder.Entity<Review>().HasOne(r => r.Product).WithMany(p => p.Reviews).HasForeignKey(r => r.Asin).HasPrincipalKey(p => p.Asin);
 
       modelBuilder.Entity<ClientProduct>()
@@ -75,5 +84,22 @@ namespace LiftDashboardApi.Data
     public string Author { get; set; }
     public Product Product { get; set; }
     public DateTime Date { get; set; }
+  }
+
+  public class ProductPriceChangeEvent
+  {
+      public int ProductPriceChangeId { get; set; }
+      public string Asin { get; set; }
+      public decimal OldPrice { get; set; }
+      public decimal NewPrice { get; set; }
+      public DateTime DateChanged { get; set; }
+  }
+  public class BuyBoxOwnerChangeEvent
+  {
+      public int BuyBoxOwnerChangeId { get; set; }
+      public string Asin { get; set; }
+      public string OldOwner { get; set; }
+      public string NewOwner { get; set; }
+      public DateTime DateChanged { get; set; }
   }
 }
